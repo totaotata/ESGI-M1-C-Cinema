@@ -13,8 +13,11 @@ Le public dispose d’un écran qui affiche le nombre restantes
 
 Travail demandé : par groupe de 2, 3 ou 4 personnes écrire un programme qui prend en
 paramètre :
+
 • le nombre de caisses,
-• le titre d’un film
+
+• le titre d’un film,
+
 • le nombre de places pour ce film.
 
 
