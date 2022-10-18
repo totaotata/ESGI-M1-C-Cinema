@@ -5,7 +5,7 @@
 
 #define TEMPS_TRAITEMENT_MAX 3 
 
-void attente_aleatoire(unsigned int delais) {
+void attente_aleatoire_traitement(unsigned int delais) {
 
 /* Initialisation du désordre */
 srandom(time(NULL) % delais);
