@@ -5,12 +5,12 @@
 
 #define ACHAT_MAX 7
 
-void attente_aleatoire(unsigned int delais) {
+int aleatoire_place() {
 
 /* Initialisation du désordre */
-srandom(time(NULL) % delais);
+srandom(time(NULL));
 
-/* Attente */
-sleep((unsigned int)(random() % ACHAT_MAX));
+/* Return random */
+return((int)(random() % ACHAT_MAX));
 
 }
