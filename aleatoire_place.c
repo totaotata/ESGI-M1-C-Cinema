@@ -11,6 +11,6 @@ void attente_aleatoire(unsigned int delais) {
 srandom(time(NULL) % delais);
 
 /* Attente */
-sleep((unsigned int)(random() % ATTENTE_MAX));
+sleep((unsigned int)(random() % ACHAT_MAX));
 
 }
