@@ -1,3 +1,9 @@
+## Start with :
+```
+make
+```
+
+
 # Au cinéma
 
 Sujet : Simulation du système de vente de places de cinéma.
