@@ -12,6 +12,9 @@ extern int *attacher_segment_memoire();
 extern int P();
 extern int V();
 
+extern void attente_aleatoire_traitement();
+extern int aleatoire_place();
+
 extern int creer_segment_memoire();
 
 int main(int argc, char *argv[])
@@ -48,7 +51,7 @@ int main(int argc, char *argv[])
      * - on crée le semaphore
      * - on crée le segment de mémoire partagé
      * - on s'attache le segment de mémoire partagé
-     * - on initialise le noombre de places de parking libres dans la shm
+     * - on initialise le nombre de places de parking libres dans la shm
      */
 
     /* Création sémaphore */
@@ -58,7 +61,7 @@ int main(int argc, char *argv[])
     creer_segment_memoire(CLE_SHM, &shmid);
 
     /*
-    printf("DEBUg : parking : shmid=%d\n", shmid);
+    printf("DEBUg : cinema : shmid=%d\n", shmid);
     */
 
     /* Attachement du segment de mémoire partagée */
@@ -78,69 +81,28 @@ int main(int argc, char *argv[])
     }
     else if (pid_display == 0)
     {
-        printf("création display\n");
+        printf("création display\n %d", pid_display);
         execl("display", "display", shmid_str, semid_str, number_of_seats_str, NULL);
     }
     int nb_caisse = atoi(argv[1]);
     for (int i = 1; i <= nb_caisse; i++)
     {
-        printf("numéro %d", i);
+        printf("numéro %d ", i);
         pid_t pid_caisse = fork();
-        if (pid_caisse == 0)
+        if (pid_caisse == -1)
         {
-            printf("création caisse\n");
+            printf("error\n");
+        }
+        else if (pid_caisse > 0)
+        {
+            printf("création caisse numéro : %d \n", pid_caisse);
             execl("caisse", "caisse", shmid_str, semid_str, NULL);
             // exit(0); // child process
         }
         // parent process
-        printf("At i = %d, process %d is terminated.\n", i, pid_caisse);
         waitpid(pid_display, &code_retour_fin_display, 0);
-        // waitpid(pid_caisse, &code_retour_fin_caisse, 0);
-
+        waitpid(pid_caisse, &code_retour_fin_caisse, 0);
+        printf("At i = %d, process %d is terminated.\n", i, pid_caisse);
         wait(NULL);
     }
-    /* création du fils caisse */
-    // pid_caisse = fork();
-
-    // if (pid_caisse == -1) {
-    //     /* Erreur */
-    //     perror("pb fork sur création caisse");
-    //     return(1);
-    // }
-
-    // if (pid_caisse == 0) {
-    //     /*
-    //     printf("Je suis le fils caisse, je vais faire execl dans 10s shmid_str=%s, semid_str=%s\n", shmid_str, semid_str);
-    //     */
-    //     execl("caisse", "caisse", shmid_str, semid_str, NULL);
-    // }
-
-    // if (pid_caisse > 0) {
-    //     /* processus père */
-
-    //     /* création du fils display */
-    //     pid_display = fork();
-
-    //     if (pid_display == -1) {
-    //         /* Erreur */
-    //         perror("pb fork sur création display");
-    //         return(1);
-    //     }
-
-    //     if (pid_display == 0) {
-    //          execl("display", "display", shmid_str, semid_str, number_of_seats_str, NULL);
-    //     }
-
-    //     /* processus père */
-
-    //     printf("Père, on attend 1000s \n");
-    //     sleep(1000);
-
-    //     waitpid(pid_caisse, &code_retour_fin_caisse, 0);
-
-    //     waitpid(pid_display, &code_retour_fin_display, 0);
-
-    //     printf("P: processus père fin\n");
-    //     return(0);
-    // }
 }
