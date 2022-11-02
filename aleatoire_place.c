@@ -9,8 +9,5 @@ int aleatoire_place() {
 
 /* Initialisation du désordre */
 srandom(time(NULL));
-
-/* Return random */
-return((int)(random() % ACHAT_MAX));
-
+return((unsigned int)(random() % ACHAT_MAX +1));
 }
