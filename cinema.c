@@ -27,6 +27,8 @@ int main(int argc, char *argv[])
 
     int number_of_seats;       /* Pour écriture dans la shm */
     char *number_of_seats_str; /* Pour conversion du semid (int) en chaine */
+    
+    char *film_title;   // Nom du film pour le display
 
     int shmid; /* Id du segment de mémoire partagé */
     int semid; /* Id du sémaphore */
@@ -47,22 +49,13 @@ int main(int argc, char *argv[])
     number_of_seats_str = argv[3];
     number_of_seats = atoi(number_of_seats_str);
 
-    /* Avant de créer les fils :
-     * - on crée le semaphore
-     * - on crée le segment de mémoire partagé
-     * - on s'attache le segment de mémoire partagé
-     * - on initialise le nombre de places de parking libres dans la shm
-     */
+    film_title = argv[2];
 
     /* Création sémaphore */
     creer_initialiser_semaphore(CLE_SEM, &semid);
 
     /* Création segment de mémoire partagé */
     creer_segment_memoire(CLE_SHM, &shmid);
-
-    /*
-    printf("DEBUg : cinema : shmid=%d\n", shmid);
-    */
 
     /* Attachement du segment de mémoire partagée */
     mem = attacher_segment_memoire(mem, &shmid);
@@ -81,13 +74,12 @@ int main(int argc, char *argv[])
     }
     else if (pid_display == 0)
     {
-        printf("création display\n %d", pid_display);
-        execl("display", "display", shmid_str, semid_str, number_of_seats_str, NULL);
+        // printf("création display\n %d", pid_display);
+        execl("display", "display", shmid_str, semid_str, number_of_seats_str, film_title, NULL);
     }
     int nb_caisse = atoi(argv[1]);
     for (int i = 1; i <= nb_caisse; i++)
     {
-        printf("numéro %d ", i);
         pid_t pid_caisse = fork();
         if (pid_caisse == -1)
         {
@@ -95,14 +87,12 @@ int main(int argc, char *argv[])
         }
         else if (pid_caisse > 0)
         {
-            printf("création caisse numéro : %d \n", pid_caisse);
+            // printf("création caisse numéro : %d \n", pid_caisse);
             execl("caisse", "caisse", shmid_str, semid_str, NULL);
-            // exit(0); // child process
         }
         // parent process
         waitpid(pid_display, &code_retour_fin_display, 0);
         waitpid(pid_caisse, &code_retour_fin_caisse, 0);
-        printf("At i = %d, process %d is terminated.\n", i, pid_caisse);
         wait(NULL);
     }
 }
