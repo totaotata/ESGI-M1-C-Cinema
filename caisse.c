@@ -27,29 +27,30 @@ bool achat_place(int *mem, int semid, int nbplace)
   /* On protège l'accès à la shm */
   P(semid);
 
-  /* Reste-t-il des places libres ? */
-  if (*mem < nbplace)
+  /* Vérification si places suffisantes ? */
+  if (*mem < aleatoire_place() && *mem == 0)
   {
-    /* No more */
-    printf("Plus de place, désolé : \n  ");
-    printf("Dans la shm il y a %d places\n", *mem);
+    /* Plus de place */
+    printf("Plus de place désolé, fermeture des caisses bon film ! \n  ");
+    // printf("Dans la shm il y a %d places\n", *mem);
     return 0;
+  }
+  else if (*mem < aleatoire_place() && *mem > 0)
+  {
+    place_attribuee = true;
+    // printf("Pas assez de place pour cette demande de %d places.\n", aleatoire_place());
+    // printf("Dans la salle il reste %d places\n", *mem);
   }
   else
   {
-    // int nbplacesrandom = aleatoire_place(random_places);
-    // printf("Nombre place random => %d\n", nbplacesrandom);
-    /* On écrit dans la shm */
-    
     *mem = (*mem - aleatoire_place());
-    printf("CAISSE => Dans la shm il y a %d places\n", *mem);
-    printf("RANDOM %i \n", aleatoire_place());
     place_attribuee = true;
+    // printf("CAISSE => Dans la shm il y a %d places\n", *mem);
+    // printf("RANDOM %i \n", aleatoire_place());
   }
 
   /* On protège l'accès à la shm */
   V(semid);
-
   return (place_attribuee);
 }
 
@@ -60,7 +61,6 @@ bool achat_place(int *mem, int semid, int nbplace)
 /******************************************************************************/
 int main(int argc, char *argv[])
 {
-  printf("ARRIVE DANS CAISSE\n");
   unsigned int delais = 1;
 
   int shmid = atoi(argv[1]);
@@ -68,30 +68,19 @@ int main(int argc, char *argv[])
 
   int *mem;
 
-  printf("Je suis %s , shmid=%d, semid=%d\n", argv[0], shmid, semid);
+  // printf("Je suis %s , shmid=%d, semid=%d\n", argv[0], shmid, semid);
 
   /* Attachement du segment de mémoire partagée */
   mem = attacher_segment_memoire(mem, &shmid);
-  // while (1)
-  // {
 
   attente_aleatoire_traitement(delais);
   int actualdispo = *mem;
   int nbplacesrandom = aleatoire_place();
-  printf("Nombre place random 0 => %d\n", nbplacesrandom);
-  if (nbplacesrandom >= 0)
-  {
-    printf("Un client se présente il voudrait %d places.\n", nbplacesrandom);
-    while (achat_place(mem, semid, nbplacesrandom))
-    {
-      sleep(1);
-    }
-  }
-  else
-  {
-    return (0);
-  }
-  // }
 
-  // return (0);
+  // printf("Un client se présente il voudrait %d places.\n", nbplacesrandom);
+  while (1)
+  {
+    achat_place(mem, semid, nbplacesrandom);
+    sleep(1);
+  }
 }

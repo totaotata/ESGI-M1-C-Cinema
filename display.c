@@ -18,7 +18,7 @@ extern int V();
  */
 /******************************************************************************/
 
-int display_seats(int *mem, int semid, int number_of_seats)
+int display_seats(int *mem, int semid, int number_of_seats, char *title)
 {
 
   /* On protège l'accès à la shm */
@@ -29,9 +29,8 @@ int display_seats(int *mem, int semid, int number_of_seats)
    * */
   if (*mem != number_of_seats)
   {
-    /* On écrit dans la shm */
-    // *mem=(*mem + 1);
-    printf("\t DISPLAY => Dans la shm il y a %d places\n", *mem);
+    // Affichage du nombre de places
+    printf("\t Pour le film %s, il reste %d places\n", title, *mem);
   }
 
   /* On protège l'accès à la shm */
@@ -47,12 +46,12 @@ int display_seats(int *mem, int semid, int number_of_seats)
 /******************************************************************************/
 int main(int argc, char *argv[])
 {
- printf("ARRIVE DANS DISPLAY\n");
   unsigned int delais = 1;
 
   int shmid = atoi(argv[1]);
   int semid = atoi(argv[2]);
-  int nb_places = atoi(argv[4]);
+  int nb_places = atoi(argv[3]);
+  char *title = argv[4];
 
   int *mem;
 
@@ -61,9 +60,9 @@ int main(int argc, char *argv[])
 
   while (1)
   {
-    attente_aleatoire_traitement(delais);
-    printf("\tUn siège est réservé ! \n");
-    display_seats(mem, semid, nb_places);
+    // Attente toutes les 5 secondes pour appel de la fonction d'affichage
+    sleep(5);
+    display_seats(mem, semid, nb_places, title);
   }
 
   return (0);
